@@ -12,6 +12,19 @@ doc:
   typst compile docs/thumbnail.typ thumbnail-light.svg
   typst compile --input theme=dark docs/thumbnail.typ thumbnail-dark.svg
 
+# build all typst files to find compile errors
+build:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  status=0
+  while IFS= read -r -d '' file; do
+    echo "building $file"
+    if ! typst compile -f pdf "$file" /dev/null; then
+      status=1
+    fi
+  done < <(find . -name '*.typ' -print0 | sort -z)
+  exit $status
+
 # run test suite
 test *args:
   tt run {{ args }}
